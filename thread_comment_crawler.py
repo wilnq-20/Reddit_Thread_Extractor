@@ -1,6 +1,5 @@
 import credentials as creds
 import praw
-import datetime as dt
 import pandas as pd
 from pandas import DataFrame
 
@@ -18,20 +17,23 @@ submission_id = str(input())
 
 print("Extracting...")
 submission = r.submission(id = submission_id)
- # submission.comments.replace_more(limit= None)    #find way to get all necessary comments (max comments not some)
 
-comments = submission.comments
+postlist = []
 
-df_rows = [[comment.parent, comment.id, comment.score, comment.created, comment.body ] for comment in comments]
-df = pd.DataFrame (df_rows, columns = ['Parent ID', 'Comment ID', 'Score', 'Created', 'Body'])
+submission.comments.replace_more(limit=None)
+for comment in submission.comments.list():
+    post = {}
+    post['Author'] = comment.author
+    post['Comment'] = comment.body
+    postlist.append(post)
 
+df = pd.DataFrame(postlist)
 print("Extraction Complete")
 
 print("What would you like extraction file to be named? (Remember to add .csv)")
 filename = str(input())
 
 df.to_csv(filename)
-
 
 
 
